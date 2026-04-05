@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-background: #000000;
+  --color-accent: #F7931A;
+  --color-accent-foreground: #000000;
+  --color-card: #0A0A0A;
+  --color-muted: #111111;
+  --color-border: #1A1A1A;
+  
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", sans-serif;
+}
+
+:root {
+  background-color: var(--color-background);
+  color: white;
+}
+
+body {
+  @apply antialiased font-sans;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.glass {
+  @apply bg-white/[0.02] backdrop-blur-xl border border-white/[0.05];
+}
+
+.btn-primary {
+  @apply bg-accent text-black font-bold py-3 px-6 rounded-xl transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2;
+}
+
+.btn-secondary {
+  @apply bg-white/[0.05] text-white font-semibold py-3 px-6 rounded-xl transition-all hover:bg-white/[0.1] active:scale-[0.98] border border-white/[0.05];
+}
+
+.badge {
+  @apply px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 border border-white/10 bg-white/5;
+}
+
+.badge-dot {
+  @apply w-1.5 h-1.5 rounded-full;
+}
