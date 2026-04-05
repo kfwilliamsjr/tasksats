@@ -42,6 +42,7 @@ export default function OrderForm() {
           <label className="block font-bold text-lg">Task Description</label>
           <textarea
             required
+            maxLength={2000}
             placeholder="Describe exactly what you need done..."
             className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 min-h-[200px] focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all"
             value={description}
@@ -77,6 +78,7 @@ export default function OrderForm() {
             <label className="block font-bold text-lg">Special Instructions</label>
             <input
               type="text"
+              maxLength={500}
               placeholder="Any specific preferences?"
               className="w-full bg-white/5 border border-white/10 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all"
             />

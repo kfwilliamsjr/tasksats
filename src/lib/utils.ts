@@ -9,7 +9,8 @@ export function formatSats(sats: number) {
   return new Intl.NumberFormat('en-US').format(sats);
 }
 
-export function satsToUsd(sats: number, pricePerBtc: number = 65000) {
+// TODO: Replace with live BTC price feed (e.g. CoinGecko API) before production
+export function satsToUsd(sats: number, pricePerBtc: number = 85000) {
   const btc = sats / 100_000_000;
   return (btc * pricePerBtc).toLocaleString('en-US', {
     style: 'currency',

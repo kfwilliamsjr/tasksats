@@ -83,6 +83,7 @@ export default function Login() {
                     <input
                       required
                       type="email"
+                      maxLength={254}
                       placeholder="Email Address"
                       className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all"
                     />
@@ -92,6 +93,7 @@ export default function Login() {
                     <input
                       required
                       type="password"
+                      maxLength={128}
                       placeholder="Password"
                       className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all"
                     />
