@@ -1,34 +1,55 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { 
-  Zap, 
-  Mail, 
-  Lock, 
-  User, 
-  Briefcase, 
-  ArrowRight, 
-  Globe, 
-  Tag, 
+import {
+  Zap,
+  Mail,
+  Lock,
+  User,
+  Briefcase,
+  ArrowRight,
+  Globe,
+  Tag,
   FileText,
   ChevronRight,
   ShieldCheck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
+import { supabase } from '../lib/supabase';
 
 export default function SignUp() {
   const navigate = useNavigate();
   const [role, setRole] = useState<'buyer' | 'vendor'>('buyer');
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate signup
-    setTimeout(() => {
+    setError('');
+
+    const { error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          display_name: email.split('@')[0],
+          role,
+        },
+      },
+    });
+
+    if (authError) {
+      setError(authError.message);
       setIsLoading(false);
-      navigate('/profile');
-    }, 2000);
+    } else {
+      // After signup, update profile role if vendor
+      // The trigger auto-creates profile with 'buyer' default
+      // We need to update it if they chose vendor
+      navigate('/');
+    }
   };
 
   return (
@@ -81,6 +102,12 @@ export default function SignUp() {
               </div>
             </div>
 
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-red-400 text-sm">
+                {error}
+              </div>
+            )}
+
             {/* Common Fields */}
             <div className="space-y-4">
               <div className="relative group">
@@ -90,6 +117,8 @@ export default function SignUp() {
                   type="email"
                   maxLength={254}
                   placeholder="Email Address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all"
                 />
               </div>
@@ -98,8 +127,11 @@ export default function SignUp() {
                 <input
                   required
                   type="password"
+                  minLength={6}
                   maxLength={128}
-                  placeholder="Password"
+                  placeholder="Password (min 6 characters)"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all"
                 />
               </div>

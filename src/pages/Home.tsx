@@ -1,13 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Zap, Star, Clock, Bot, User, ArrowRight, ShieldCheck } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { formatSats, satsToUsd, cn } from '../lib/utils';
 import { motion } from 'motion/react';
 import { CATEGORIES, MOCK_LISTINGS } from '../constants';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 export default function Home() {
   const [search, setSearch] = useState('');
+  const [listings, setListings] = useState<any[]>(MOCK_LISTINGS);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+
+    const fetchListings = async () => {
+      const { data, error } = await supabase
+        .from('listings')
+        .select('*, profiles(display_name, avatar_url)')
+        .eq('status', 'active')
+        .order('created_at', { ascending: false });
+
+      if (data && data.length > 0) {
+        // Map DB listings to the display format
+        setListings(data.map((l: any) => ({
+          id: l.id,
+          title: l.title,
+          vendor: l.profiles?.display_name || 'Unknown',
+          price: l.price_sats,
+          rating: l.rating_avg || 4.8,
+          delivery: l.estimated_delivery || 'TBD',
+          type: l.fulfillment_type === 'ai-agent' ? 'AI Agent' : l.fulfillment_type === 'hybrid' ? 'Hybrid' : 'Human',
+          category: l.category,
+          description: l.description,
+        })));
+      }
+      // If no listings from DB, keep MOCK_LISTINGS as fallback
+    };
+
+    fetchListings();
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -157,7 +189,7 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {MOCK_LISTINGS.map((item) => (
+          {listings.map((item) => (
             <Link key={item.id} to={`/service/${item.id}`}>
               <motion.div 
                 whileHover={{ y: -8 }}

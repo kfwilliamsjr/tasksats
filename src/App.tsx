@@ -18,8 +18,6 @@ import VendorApplication from './pages/VendorApplication';
 import NotFound from './pages/NotFound';
 import ErrorBoundary from './components/ErrorBoundary';
 
-import { isSupabaseConfigured } from './lib/supabase';
-
 function AppRoutes() {
   const { user, loading } = useAuth();
 
