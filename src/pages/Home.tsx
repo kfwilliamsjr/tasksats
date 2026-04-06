@@ -6,6 +6,8 @@ import { motion } from 'motion/react';
 import { CATEGORIES, MOCK_LISTINGS } from '../constants';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
+const PRE_LAUNCH = true; // Flip to false when marketplace is ready to go live
+
 export default function Home() {
   const [search, setSearch] = useState('');
   const [listings, setListings] = useState<any[]>(MOCK_LISTINGS);
@@ -103,7 +105,7 @@ export default function Home() {
         {/* Early Access Form */}
         <div className="max-w-md mx-auto space-y-6">
           <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.3em]">Get Early Access</p>
-          <form onSubmit={handleWaitlist} className="flex flex-col sm:flex-row gap-2 p-2 bg-white/5 border border-white/10 rounded-2xl">
+          <form id="waitlist-form" onSubmit={handleWaitlist} className="flex flex-col sm:flex-row gap-2 p-2 bg-white/5 border border-white/10 rounded-2xl">
             <input
               type="email"
               required
@@ -148,6 +150,22 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      {/* Coming Soon Banner */}
+      {PRE_LAUNCH && (
+        <section className="relative overflow-hidden rounded-3xl border border-accent/20 bg-accent/5 p-8 text-center">
+          <div className="absolute inset-0 bg-gradient-to-r from-accent/10 via-transparent to-accent/10 animate-pulse" />
+          <div className="relative z-10 space-y-3">
+            <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full border border-accent/30 bg-accent/10 text-accent text-[10px] font-bold uppercase tracking-widest">
+              <Zap size={12} className="fill-accent" /> Coming Soon
+            </div>
+            <h3 className="text-2xl font-black font-display">Marketplace Launching Soon</h3>
+            <p className="text-gray-400 text-sm max-w-lg mx-auto">
+              We're onboarding early vendors and testers. Drop your email above to get notified when we go live.
+            </p>
+          </div>
+        </section>
+      )}
 
       {/* Feature Grid */}
       <section className="grid grid-cols-2 md:grid-cols-4 border border-white/5 rounded-3xl overflow-hidden">
@@ -195,11 +213,19 @@ export default function Home() {
           <p className="text-gray-400 text-lg">
             Start selling your digital services and get paid instantly in Bitcoin. No chargebacks, no delays, no borders.
           </p>
-          <Link to="/apply" className="inline-block">
-            <button className="btn-primary px-8 py-4 text-lg flex items-center gap-3">
-              Become a Vendor <ArrowRight size={20} />
-            </button>
-          </Link>
+          {PRE_LAUNCH ? (
+            <a href="#waitlist-form" className="inline-block" onClick={(e) => { e.preventDefault(); document.getElementById('waitlist-form')?.scrollIntoView({ behavior: 'smooth' }); }}>
+              <button className="btn-primary px-8 py-4 text-lg flex items-center gap-3">
+                Join the Waitlist <ArrowRight size={20} />
+              </button>
+            </a>
+          ) : (
+            <Link to="/apply" className="inline-block">
+              <button className="btn-primary px-8 py-4 text-lg flex items-center gap-3">
+                Become a Vendor <ArrowRight size={20} />
+              </button>
+            </Link>
+          )}
         </div>
         <div className="relative w-full md:w-1/3 aspect-square">
           <div className="absolute inset-0 bg-accent/20 blur-[100px] rounded-full animate-pulse" />
@@ -210,7 +236,15 @@ export default function Home() {
       </section>
 
       {/* Search & Listings (Keep functionality but update UI) */}
-      <section className="space-y-12">
+      <section className={cn("space-y-12 relative", PRE_LAUNCH && "pointer-events-none")}>
+        {PRE_LAUNCH && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center">
+            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-accent/30 bg-black/80 backdrop-blur-sm text-accent text-sm font-bold uppercase tracking-widest">
+              <Zap size={14} className="fill-accent" /> Coming Soon
+            </div>
+          </div>
+        )}
+        <div className={cn(PRE_LAUNCH && "blur-[2px] opacity-60")}>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-2">
             <h2 className="text-4xl font-black font-display">Marketplace</h2>
@@ -271,6 +305,7 @@ export default function Home() {
               </motion.div>
             </Link>
           ))}
+        </div>
         </div>
       </section>
     </div>

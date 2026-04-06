@@ -2,10 +2,12 @@ import React from 'react';
 import { NavLink, Outlet, Link } from 'react-router-dom';
 import { Home, Wallet, LayoutDashboard, Settings, Search, Zap, User, LogIn } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { useBtcPrice } from '../hooks/useBtcPrice';
 import { cn } from '../lib/utils';
 
 export default function Layout() {
   const { role, user } = useAuth();
+  const { price, loading: priceLoading } = useBtcPrice();
 
   const navItems = [
     { to: '/', icon: Home, label: 'Home' },
@@ -34,7 +36,9 @@ export default function Layout() {
         <div className="flex items-center gap-4">
           <div className="hidden sm:flex flex-col items-end">
             <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">BTC Price</span>
-            <span className="text-xs font-mono text-gray-400">$67,337</span>
+            <span className="text-xs font-mono text-gray-400">
+              {priceLoading ? '...' : price ? `$${price.toLocaleString('en-US', { maximumFractionDigits: 0 })}` : '—'}
+            </span>
           </div>
           
           {user ? (

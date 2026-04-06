@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Settings } from 'lucide-react';
 import { AuthProvider, useAuth } from './hooks/useAuth';
+import { BtcPriceProvider } from './hooks/useBtcPrice';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import ServiceListing from './pages/ServiceListing';
@@ -53,7 +54,9 @@ export default function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
-        <AppRoutes />
+        <BtcPriceProvider>
+          <AppRoutes />
+        </BtcPriceProvider>
       </AuthProvider>
     </ErrorBoundary>
   );
