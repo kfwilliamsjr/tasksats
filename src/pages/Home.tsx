@@ -9,7 +9,32 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 export default function Home() {
   const [search, setSearch] = useState('');
   const [listings, setListings] = useState<any[]>(MOCK_LISTINGS);
+  const [waitlistEmail, setWaitlistEmail] = useState('');
+  const [waitlistStatus, setWaitlistStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [waitlistMsg, setWaitlistMsg] = useState('');
   const navigate = useNavigate();
+
+  const handleWaitlist = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!waitlistEmail.trim()) return;
+    setWaitlistStatus('loading');
+    const { error } = await supabase
+      .from('waitlist')
+      .insert({ email: waitlistEmail.trim().toLowerCase() });
+    if (error) {
+      if (error.code === '23505') {
+        setWaitlistStatus('success');
+        setWaitlistMsg("You're already on the list!");
+      } else {
+        setWaitlistStatus('error');
+        setWaitlistMsg('Something went wrong. Try again.');
+      }
+    } else {
+      setWaitlistStatus('success');
+      setWaitlistMsg("You're in! We'll notify you at launch.");
+      setWaitlistEmail('');
+    }
+  };
 
   useEffect(() => {
     if (!isSupabaseConfigured) return;
@@ -79,17 +104,33 @@ export default function Home() {
         {/* Early Access Form */}
         <div className="max-w-md mx-auto space-y-6">
           <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.3em]">Get Early Access</p>
-          <div className="flex flex-col sm:flex-row gap-2 p-2 bg-white/5 border border-white/10 rounded-2xl">
+          <form onSubmit={handleWaitlist} className="flex flex-col sm:flex-row gap-2 p-2 bg-white/5 border border-white/10 rounded-2xl">
             <input
               type="email"
+              required
               placeholder="you@domain.com"
               className="flex-1 bg-transparent px-4 py-3 focus:outline-none text-sm"
+              value={waitlistEmail}
+              onChange={(e) => { setWaitlistEmail(e.target.value); setWaitlistStatus('idle'); }}
+              disabled={waitlistStatus === 'loading'}
             />
-            <button className="btn-primary whitespace-nowrap">
-              Notify Me <Zap size={16} className="fill-black" />
+            <button
+              type="submit"
+              className="btn-primary whitespace-nowrap"
+              disabled={waitlistStatus === 'loading'}
+            >
+              {waitlistStatus === 'loading' ? 'Joining...' : 'Notify Me'} <Zap size={16} className="fill-black" />
             </button>
-          </div>
-          <p className="text-[10px] text-gray-600 uppercase tracking-widest">No spam. Launch notification only.</p>
+          </form>
+          {waitlistStatus === 'success' && (
+            <p className="text-[10px] text-accent uppercase tracking-widest">{waitlistMsg}</p>
+          )}
+          {waitlistStatus === 'error' && (
+            <p className="text-[10px] text-red-400 uppercase tracking-widest">{waitlistMsg}</p>
+          )}
+          {waitlistStatus === 'idle' && (
+            <p className="text-[10px] text-gray-600 uppercase tracking-widest">No spam. Launch notification only.</p>
+          )}
         </div>
 
         {/* Badges */}
