@@ -18,9 +18,8 @@ export default function Home() {
     e.preventDefault();
     if (!waitlistEmail.trim()) return;
     setWaitlistStatus('loading');
-    const { error } = await supabase
-      .from('waitlist')
-      .insert({ email: waitlistEmail.trim().toLowerCase() });
+    const { error } = await spabase
+      .rpc('add_to_waitlist', { user_email: waitlistEmail.trim().toLowerCase() });
     if (error) {
       if (error.code === '23505') {
         setWaitlistStatus('success');
