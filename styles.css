@@ -1,0 +1,718 @@
+:root {
+  --bg: #f5efe4;
+  --bg-deep: #1f1c17;
+  --surface: rgba(255, 250, 243, 0.7);
+  --surface-strong: #fff8ef;
+  --text: #1f1b16;
+  --muted: #6c6256;
+  --line: rgba(31, 27, 22, 0.12);
+  --accent: #ef7e22;
+  --accent-deep: #b9570c;
+  --accent-soft: #ffd8b0;
+  --olive: #314136;
+  --shadow: 0 24px 80px rgba(58, 37, 12, 0.12);
+  --radius-lg: 32px;
+  --radius-md: 22px;
+  --radius-sm: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: "Space Grotesk", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(239, 126, 34, 0.12), transparent 28%),
+    radial-gradient(circle at 80% 20%, rgba(49, 65, 54, 0.1), transparent 22%),
+    linear-gradient(180deg, #fcf8f2 0%, #f3ebdf 100%);
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+}
+
+.site-shell {
+  width: min(1240px, calc(100% - 32px));
+  margin: 0 auto;
+  padding-bottom: 48px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px 0;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: blur(12px);
+  background: rgba(245, 239, 228, 0.74);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-mark {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), #ffbc73);
+  color: #1c1209;
+  font-weight: 700;
+  box-shadow: 0 16px 30px rgba(239, 126, 34, 0.32);
+}
+
+.brand-copy {
+  display: grid;
+  gap: 2px;
+}
+
+.brand-copy strong {
+  font-size: 1rem;
+}
+
+.brand-copy span {
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+
+.topnav,
+.topbar-actions,
+.hero-actions,
+.signal-row,
+.payment-topline,
+.payment-status,
+.invoice-row,
+.invoice-actions,
+.cta-actions,
+.dialog-actions {
+  display: flex;
+  align-items: center;
+}
+
+.topnav,
+.topbar-actions,
+.hero-actions,
+.payment-status,
+.invoice-actions,
+.cta-actions,
+.dialog-actions {
+  gap: 12px;
+}
+
+.topnav a {
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.primary-button,
+.secondary-button,
+.ghost-button,
+.inline-button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.9rem 1.25rem;
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease;
+}
+
+.primary-button {
+  background: var(--accent);
+  color: #1f1206;
+  box-shadow: 0 16px 30px rgba(239, 126, 34, 0.28);
+}
+
+.secondary-button {
+  background: var(--olive);
+  color: #f7f3ee;
+}
+
+.ghost-button,
+.inline-button {
+  background: rgba(255, 255, 255, 0.45);
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+
+.primary-button:hover,
+.secondary-button:hover,
+.ghost-button:hover,
+.inline-button:hover {
+  transform: translateY(-1px);
+}
+
+.hero,
+.split-section,
+.cta-section {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 28px;
+}
+
+.hero {
+  padding: 42px 0 32px;
+  align-items: start;
+}
+
+.hero-copy,
+.hero-panel,
+.story-card,
+.steps-panel,
+.flow-card,
+.invoice-demo,
+.vendor-column,
+.roadmap-list article,
+.cta-section,
+.dialog-card {
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 248, 239, 0.68);
+  box-shadow: var(--shadow);
+}
+
+.hero-copy,
+.hero-panel,
+.steps-panel,
+.invoice-demo,
+.cta-section {
+  border-radius: var(--radius-lg);
+  padding: 36px;
+}
+
+.eyebrow {
+  margin: 0 0 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.75rem;
+  color: var(--accent-deep);
+  font-weight: 700;
+}
+
+.hero h1,
+.section-header h2,
+.split-copy h2,
+.cta-section h2,
+.story-large h2 {
+  margin: 0;
+  line-height: 0.96;
+  letter-spacing: -0.05em;
+}
+
+.hero h1 {
+  font-size: clamp(3.4rem, 8vw, 6.9rem);
+  max-width: 10ch;
+}
+
+.hero h1 span,
+.story-large h2,
+.cta-section h2 {
+  display: block;
+  font-family: "Instrument Serif", serif;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--olive);
+}
+
+.hero-text {
+  max-width: 58ch;
+  font-size: 1.06rem;
+  line-height: 1.7;
+  color: var(--muted);
+  margin: 22px 0 28px;
+}
+
+.signal-row {
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 0;
+  margin: 26px 0 0;
+  list-style: none;
+}
+
+.signal-row li,
+.payment-topline span:last-child,
+.flow-card h3,
+.invoice-label,
+.roadmap-list span {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+}
+
+.signal-row li {
+  padding: 0.65rem 0.95rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--line);
+}
+
+.hero-panel {
+  display: grid;
+  gap: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 237, 216, 0.9) 0%, rgba(255, 248, 239, 0.84) 100%);
+}
+
+.metric-card,
+.payment-mock {
+  border-radius: 24px;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(31, 27, 22, 0.08);
+}
+
+.metric-label,
+.payment-amount span,
+.story-card span,
+.flow-card p,
+.invoice-row span,
+.vendor-column p,
+.roadmap-list p {
+  color: var(--muted);
+}
+
+.metric-card strong,
+.payment-amount strong,
+.flow-title,
+.invoice-main strong {
+  display: block;
+  font-size: 1.35rem;
+  margin: 8px 0 10px;
+}
+
+.payment-amount strong {
+  font-size: 2.4rem;
+}
+
+.payment-amount span {
+  font-size: 0.95rem;
+}
+
+.qr-shell {
+  margin: 22px 0;
+  border-radius: 24px;
+  background: #f8f4ef;
+  padding: 22px;
+  display: grid;
+  place-items: center;
+}
+
+.qr-grid {
+  width: min(100%, 220px);
+  aspect-ratio: 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.qr-grid span {
+  background: linear-gradient(135deg, #181511 0%, #41372d 100%);
+  border-radius: 8px;
+}
+
+.payment-topline,
+.payment-status,
+.invoice-row {
+  justify-content: space-between;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  border-radius: 50%;
+  margin-right: 8px;
+  background: var(--accent);
+  box-shadow: 0 0 0 8px rgba(239, 126, 34, 0.14);
+}
+
+.trust-strip {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin: 10px 0 56px;
+}
+
+.trust-strip p {
+  margin: 0;
+  padding: 18px 20px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  text-align: center;
+}
+
+.story-grid,
+.pricing-grid,
+.flow-grid,
+.domains-grid,
+.vendors-grid,
+.roadmap-list {
+  display: grid;
+  gap: 20px;
+}
+
+.story-grid {
+  grid-template-columns: 1.2fr 1fr 1fr;
+  margin-bottom: 60px;
+}
+
+.pricing-section,
+.domains-section,
+.vendors-section,
+.roadmap-section {
+  margin-bottom: 60px;
+}
+
+.story-card {
+  border-radius: var(--radius-md);
+  padding: 28px;
+}
+
+.story-large {
+  grid-row: span 2;
+}
+
+.story-large h2,
+.section-header h2,
+.split-copy h2,
+.cta-section h2 {
+  font-size: clamp(2rem, 4vw, 3.4rem);
+}
+
+.story-card h3,
+.flow-title,
+.vendor-column h3,
+.dialog-card h3 {
+  margin: 0 0 12px;
+  font-size: 1.4rem;
+}
+
+.story-card p,
+.split-copy p,
+.steps-panel p,
+.invoice-sidebar li,
+.dialog-card p {
+  line-height: 1.65;
+  color: var(--muted);
+}
+
+.split-section,
+.lightning-section {
+  margin-bottom: 60px;
+}
+
+.pricing-grid,
+.domains-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.pricing-card,
+.domain-card {
+  border-radius: var(--radius-md);
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 248, 239, 0.68);
+  box-shadow: var(--shadow);
+}
+
+.featured-pricing {
+  background: linear-gradient(165deg, rgba(255, 230, 201, 0.95), rgba(255, 248, 239, 0.74));
+}
+
+.pricing-kicker {
+  margin: 0 0 14px;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--accent-deep);
+  font-weight: 700;
+}
+
+.pricing-card h3,
+.domain-card h3 {
+  margin: 0 0 12px;
+  font-size: 1.5rem;
+}
+
+.pricing-copy,
+.domain-card p,
+.site-footer p,
+.site-footer span {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.pricing-amount {
+  margin: 20px 0;
+}
+
+.pricing-amount strong {
+  display: block;
+  font-size: 2rem;
+  margin-bottom: 6px;
+}
+
+.pricing-amount span,
+.domain-card span {
+  font-size: 0.9rem;
+  color: var(--accent-deep);
+  font-weight: 700;
+}
+
+.feature-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.feature-list li {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--line);
+}
+
+.split-copy {
+  padding: 18px 6px 0 0;
+}
+
+.steps-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.steps-panel article {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.steps-panel article:last-child {
+  border-bottom: 0;
+}
+
+.steps-panel span {
+  color: var(--accent-deep);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 24px;
+  margin-bottom: 22px;
+}
+
+.section-header h2 {
+  max-width: 14ch;
+}
+
+.flow-grid {
+  grid-template-columns: repeat(3, 1fr);
+  margin-bottom: 22px;
+}
+
+.flow-card {
+  border-radius: var(--radius-md);
+  padding: 24px;
+}
+
+.active-flow {
+  background: linear-gradient(160deg, rgba(49, 65, 54, 0.94), rgba(73, 93, 79, 0.9));
+  color: #f7f4ef;
+}
+
+.active-flow p,
+.active-flow .flow-title,
+.active-flow h3 {
+  color: #f7f4ef;
+}
+
+.invoice-demo {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 20px;
+}
+
+.invoice-sidebar {
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(239, 126, 34, 0.14), rgba(239, 126, 34, 0.04));
+  padding: 24px;
+}
+
+.invoice-sidebar ul {
+  padding-left: 18px;
+  margin: 18px 0 0;
+  color: var(--muted);
+}
+
+.invoice-main {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+
+.vendors-grid,
+.roadmap-list {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.vendor-column,
+.roadmap-list article {
+  border-radius: var(--radius-md);
+  padding: 28px;
+}
+
+.cta-section {
+  align-items: center;
+  margin-top: 24px;
+  background: linear-gradient(135deg, rgba(255, 240, 220, 0.94), rgba(255, 248, 239, 0.84));
+}
+
+.checkout-dialog {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  width: min(92vw, 520px);
+}
+
+.checkout-dialog::backdrop {
+  background: rgba(24, 21, 17, 0.55);
+  backdrop-filter: blur(8px);
+}
+
+.dialog-card {
+  border-radius: 28px;
+  padding: 32px;
+}
+
+.dialog-invoice {
+  margin: 22px 0;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.54);
+  border: 1px solid var(--line);
+}
+
+.dialog-invoice strong {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.site-footer {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 20px;
+  margin-top: 28px;
+  padding: 28px 0 12px;
+  border-top: 1px solid var(--line);
+}
+
+.site-footer strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+@media (max-width: 980px) {
+  .topbar,
+  .hero,
+  .split-section,
+  .cta-section,
+  .invoice-demo,
+  .story-grid,
+  .pricing-grid,
+  .flow-grid,
+  .domains-grid,
+  .vendors-grid,
+  .roadmap-list,
+  .trust-strip,
+  .site-footer {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    align-items: start;
+    flex-wrap: wrap;
+  }
+
+  .topnav {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .hero h1 {
+    max-width: 100%;
+  }
+
+  .section-header {
+    align-items: start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-shell {
+    width: min(100% - 20px, 1240px);
+  }
+
+  .hero-copy,
+  .hero-panel,
+  .steps-panel,
+  .invoice-demo,
+  .cta-section,
+  .story-card,
+  .vendor-column,
+  .roadmap-list article,
+  .dialog-card {
+    padding: 24px;
+  }
+
+  .topbar-actions,
+  .hero-actions,
+  .invoice-actions,
+  .cta-actions,
+  .dialog-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .topbar-actions a,
+  .hero-actions a,
+  .invoice-actions button,
+  .cta-actions a,
+  .dialog-actions button {
+    text-align: center;
+  }
+
+  .payment-status {
+    align-items: start;
+    flex-direction: column;
+    gap: 12px;
+  }
+}
