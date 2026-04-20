@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./auth";
 import { ProtectedRoute } from "./ProtectedRoute";
+import { ActivityPage } from "./pages/ActivityPage";
 import { HomePage } from "./pages/HomePage";
 import { InvoicePreviewPage } from "./pages/InvoicePreviewPage";
 import { MerchantPage } from "./pages/MerchantPage";
@@ -24,6 +25,14 @@ export default function App() {
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/invoice-preview" element={<InvoicePreviewPage />} />
           <Route path="/invoice-preview/:invoiceId" element={<InvoicePreviewPage />} />
+          <Route
+            path="/activity"
+            element={
+              <ProtectedRoute allowedRoles={["merchant", "admin"]}>
+                <ActivityPage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/merchant"
             element={

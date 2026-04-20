@@ -1,15 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth, type AuthRole } from "../auth";
+import { fetchAuthStatus, signInWithServer, useAuth, type AuthRole, type AuthStatus } from "../auth";
 
 export function SignInPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { signIn } = useAuth();
+  const [authStatus, setAuthStatus] = useState<AuthStatus | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState("");
   const [formState, setFormState] = useState({
     name: "",
     email: "",
     role: "merchant" as AuthRole,
+    passphrase: "",
   });
 
   const destination =
@@ -22,16 +26,32 @@ export function SignInPage() {
 
   function updateField<K extends keyof typeof formState>(field: K, value: (typeof formState)[K]) {
     setFormState((current) => ({ ...current, [field]: value }));
+    setFormError("");
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    void fetchAuthStatus().then(setAuthStatus);
+  }, []);
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    signIn({
-      name: formState.name.trim() || "TaskSats User",
-      email: formState.email.trim(),
-      role: formState.role,
-    });
-    navigate(destination, { replace: true });
+    setIsSubmitting(true);
+    setFormError("");
+
+    try {
+      const result = await signInWithServer({
+        name: formState.name.trim() || "TaskSats User",
+        email: formState.email.trim(),
+        role: formState.role,
+        passphrase: formState.passphrase.trim(),
+      });
+      signIn(result.session);
+      navigate(destination, { replace: true });
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : "Sign in failed.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -41,10 +61,11 @@ export function SignInPage() {
           <p className="eyebrow">Sign in</p>
           <h1>Access protected TaskSats workspaces.</h1>
           <p className="merchant-subcopy">
-            This is a local Phase 1 auth layer. It protects merchant and admin-style
-            surfaces now and can later be replaced by Supabase or another real auth
-            provider.
+            This Phase 1 auth layer now checks the local API before granting access, so
+            merchant and admin workspaces can reflect whether the server is open-local or
+            protected by a TaskSats auth secret.
           </p>
+          {authStatus ? <p className="form-hint">{authStatus.message}</p> : null}
 
           <form className="request-form" onSubmit={handleSubmit}>
             <label className="form-field">
@@ -78,12 +99,27 @@ export function SignInPage() {
               </select>
             </label>
 
+            {authStatus?.enabled ? (
+              <label className="form-field">
+                <span>Auth secret</span>
+                <input
+                  type="password"
+                  value={formState.passphrase}
+                  onChange={(event) => updateField("passphrase", event.target.value)}
+                  placeholder="Enter TaskSats auth secret"
+                  required
+                />
+              </label>
+            ) : null}
+
+            {formError ? <p className="form-error">{formError}</p> : null}
+
             <div className="request-form-footer">
               <Link className="ghost-button" to="/">
                 Back home
               </Link>
-              <button className="primary-button" type="submit">
-                Sign in
+              <button className="primary-button" type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Signing in..." : "Sign in"}
               </button>
             </div>
           </form>

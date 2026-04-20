@@ -8,6 +8,9 @@ export type DeliveryRecord = {
   body: string;
   status: string;
   detail: string;
+  source?: string;
+  invoiceId?: string;
+  providerKey?: string;
 };
 
 const API_BASE_URL = "http://localhost:4175/api";
