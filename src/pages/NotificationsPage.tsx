@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchDeliveries, type DeliveryRecord } from "../deliveries";
+import { fetchDeliveries, retryDelivery, type DeliveryRecord } from "../deliveries";
 import {
   fetchSyncHistory,
   fetchInvoices,
@@ -35,16 +35,48 @@ export function NotificationsPage() {
   const [provider, setProvider] = useState<PaymentProviderSummary | null>(null);
   const [sourceFilter, setSourceFilter] = useState("All");
   const [deliveryFilter, setDeliveryFilter] = useState("All");
+  const [statusMessage, setStatusMessage] = useState("");
+  const [retryingDeliveryId, setRetryingDeliveryId] = useState("");
+
+  async function loadNotificationsWorkspace() {
+    const [nextNotifications, nextDeliveries, nextInvoices, nextSyncHistory, nextProvider] =
+      await Promise.all([
+        fetchNotifications().catch(() => []),
+        fetchDeliveries().catch(() => []),
+        fetchInvoices().catch(() => []),
+        fetchSyncHistory().catch(() => []),
+        fetchPaymentProvider()
+          .then((payload: PaymentProviderResponse) => payload.provider)
+          .catch(() => null),
+      ]);
+
+    setNotifications(nextNotifications);
+    setDeliveries(nextDeliveries);
+    setInvoices(nextInvoices);
+    setSyncHistory(nextSyncHistory);
+    setProvider(nextProvider);
+  }
 
   useEffect(() => {
-    void fetchNotifications().then(setNotifications).catch(() => setNotifications([]));
-    void fetchDeliveries().then(setDeliveries).catch(() => setDeliveries([]));
-    void fetchInvoices().then(setInvoices).catch(() => setInvoices([]));
-    void fetchSyncHistory().then(setSyncHistory).catch(() => setSyncHistory([]));
-    void fetchPaymentProvider()
-      .then((payload: PaymentProviderResponse) => setProvider(payload.provider))
-      .catch(() => setProvider(null));
+    void loadNotificationsWorkspace();
   }, []);
+
+  async function handleRetryDelivery(deliveryId: string) {
+    setRetryingDeliveryId(deliveryId);
+    setStatusMessage("");
+
+    try {
+      const result = await retryDelivery(deliveryId);
+      await loadNotificationsWorkspace();
+      setStatusMessage(
+        `Delivery retry completed with status: ${result.delivery?.status ?? "unknown"}.`,
+      );
+    } catch {
+      setStatusMessage("Delivery retry could not be completed.");
+    } finally {
+      setRetryingDeliveryId("");
+    }
+  }
 
   function exportOperationsJson() {
     downloadTextFile(
@@ -141,6 +173,7 @@ export function NotificationsPage() {
         </section>
 
         <div className="merchant-filter-bar">
+          {statusMessage ? <p className="status-banner">{statusMessage}</p> : null}
           <label className="form-field merchant-filter-field">
             <span>Source filter</span>
             <select
@@ -222,6 +255,18 @@ export function NotificationsPage() {
                     ) : null}
                   </div>
                 </div>
+                {delivery ? (
+                  <div className="activity-actions">
+                    <button
+                      className="ghost-button"
+                      type="button"
+                      onClick={() => void handleRetryDelivery(delivery.id)}
+                      disabled={retryingDeliveryId === delivery.id}
+                    >
+                      {retryingDeliveryId === delivery.id ? "Retrying..." : "Retry delivery"}
+                    </button>
+                  </div>
+                ) : null}
               </article>
               );
             })}

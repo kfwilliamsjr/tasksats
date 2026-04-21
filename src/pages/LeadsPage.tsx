@@ -204,6 +204,25 @@ export function LeadsPage() {
                       </div>
                     </div>
                     <p className="lead-details-copy">{lead.details}</p>
+                    <div className="activity-actions">
+                      <Link
+                        className="ghost-button"
+                        to="/merchant"
+                        state={{
+                          leadToInvoice: {
+                            id: lead.id,
+                            name: lead.name,
+                            email: lead.email,
+                            company: lead.company,
+                            offer: lead.offer,
+                            budget: lead.budget,
+                            details: lead.details,
+                          },
+                        }}
+                      >
+                        Convert to invoice
+                      </Link>
+                    </div>
                   </article>
                 ))}
               </div>

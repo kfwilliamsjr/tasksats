@@ -10,6 +10,7 @@ This repo currently includes:
 - A hosted invoice preview with simulated payment progression
 - An operations dashboard for provider switching, webhook tests, exports, and launch readiness
 - Import and export tools for system snapshots and local restore workflows
+- A launch settings workspace for business identity, domains, and operator defaults
 - A local API with JSON-backed storage for leads, invoices, notifications, and deliveries
 - A server-aware sign-in flow that can require `TASKSATS_AUTH_SECRET` for protected surfaces
 

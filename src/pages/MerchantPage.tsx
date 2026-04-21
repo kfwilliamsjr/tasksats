@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../auth";
 import {
   fetchInvoices,
@@ -19,9 +19,22 @@ import {
   parseCurrencyInput,
   validateInvoiceDraft,
 } from "../pricing";
+import { getOfferLabel } from "../data";
+
+type LeadToInvoiceState = {
+  id: string;
+  name: string;
+  email: string;
+  company: string;
+  offer: string;
+  budget: string;
+  details: string;
+};
 
 export function MerchantPage() {
   const { session, signOut } = useAuth();
+  const location = useLocation();
+  const hasPrefilledFromLead = useRef(false);
   const [invoices, setInvoices] = useState<InvoiceRecord[]>([]);
   const [showCreate, setShowCreate] = useState(false);
   const [createdInvoiceId, setCreatedInvoiceId] = useState("");
@@ -35,6 +48,7 @@ export function MerchantPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [invoiceActionMessage, setInvoiceActionMessage] = useState("");
   const [syncingInvoiceId, setSyncingInvoiceId] = useState("");
+  const [selectedLeadId, setSelectedLeadId] = useState("");
   const [formState, setFormState] = useState({
     client: "",
     service: "",
@@ -56,6 +70,36 @@ export function MerchantPage() {
   useEffect(() => {
     void loadMerchantData();
   }, []);
+
+  useEffect(() => {
+    const lead = (location.state as { leadToInvoice?: LeadToInvoiceState } | null)?.leadToInvoice;
+
+    if (!lead || hasPrefilledFromLead.current) {
+      return;
+    }
+
+    const leadBudgetUsd = parseCurrencyInput(lead.budget);
+    const offerLabel = lead.offer ? getOfferLabel(lead.offer) : "Custom request";
+    const serviceLabel = lead.company
+      ? `${offerLabel} for ${lead.company}`
+      : `${offerLabel} for ${lead.name}`;
+    const nextUsd = leadBudgetUsd > 0 ? formatUsdValue(leadBudgetUsd) : "";
+    const nextBtc = leadBudgetUsd > 0 ? formatBtcValue(calculateBtcFromUsd(leadBudgetUsd)) : "";
+
+    setFormState({
+      client: lead.company || lead.name,
+      service: serviceLabel,
+      amountUsd: nextUsd,
+      amountBtc: nextBtc,
+      status: "Open",
+    });
+    setSelectedLeadId(lead.id);
+    setBtcEditedManually(false);
+    setShowCreate(true);
+    setFormError("");
+    setInvoiceActionMessage(`Lead ${lead.id} loaded into a new invoice draft.`);
+    hasPrefilledFromLead.current = true;
+  }, [location.state]);
 
   const invoiceStats = useMemo(() => {
     const openCount = invoices.filter((invoice) => invoice.status === "Open").length;
@@ -140,7 +184,8 @@ export function MerchantPage() {
       const matchesStatus = statusFilter === "All" || invoice.status === statusFilter;
       const matchesProvider =
         providerFilter === "All" || (invoice.providerKey ?? "unassigned") === providerFilter;
-      const haystack = `${invoice.id} ${invoice.client} ${invoice.service}`.toLowerCase();
+      const haystack =
+        `${invoice.id} ${invoice.client} ${invoice.service} ${invoice.sourceLeadId ?? ""}`.toLowerCase();
       const matchesSearch = !normalizedQuery || haystack.includes(normalizedQuery);
       return matchesStatus && matchesProvider && matchesSearch;
     });
@@ -271,7 +316,10 @@ export function MerchantPage() {
     }
 
     try {
-      const invoice = await saveInvoice(formState);
+      const invoice = await saveInvoice({
+        ...formState,
+        sourceLeadId: selectedLeadId,
+      });
       setCreatedInvoiceId(invoice.id);
       await loadMerchantData();
       setFormState({
@@ -281,6 +329,7 @@ export function MerchantPage() {
         amountBtc: "",
         status: "Open",
       });
+      setSelectedLeadId("");
       setBtcEditedManually(false);
       setFormError("");
       setShowCreate(false);
@@ -546,6 +595,9 @@ export function MerchantPage() {
                     </span>
                   </div>
                 </div>
+                {selectedLeadId ? (
+                  <p className="form-hint">Source lead linked: {selectedLeadId}</p>
+                ) : null}
 
                 <div className="form-grid">
                   <label className="form-field">
@@ -679,6 +731,7 @@ export function MerchantPage() {
                       <p>
                         {invoice.status}
                         {invoice.providerKey ? ` · ${invoice.providerKey}` : ""}
+                        {invoice.sourceLeadId ? ` · lead ${invoice.sourceLeadId}` : ""}
                       </p>
                     </div>
                     <div className="invoice-row-actions">

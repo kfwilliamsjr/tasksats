@@ -454,6 +454,7 @@ function normalizeInvoice(input) {
     amountBtc:
       amountBtc > 0 ? `${amountBtc.toFixed(8)} BTC` : String(input.amountBtc ?? "").trim(),
     status: allowedInvoiceStatuses.has(normalizedStatus) ? normalizedStatus : "Open",
+    sourceLeadId: String(input.sourceLeadId ?? "").trim(),
     providerKey,
     providerInvoiceId: String(input.providerInvoiceId ?? "").trim(),
     hostedCheckoutUrl: String(input.hostedCheckoutUrl ?? "").trim(),
@@ -770,6 +771,28 @@ async function sendNotificationTest() {
   };
 }
 
+async function retryDelivery(deliveryId) {
+  const deliveries = await readDeliveries();
+  const delivery = deliveries.find((item) => item.id === deliveryId) ?? null;
+
+  if (!delivery) {
+    return null;
+  }
+
+  await updateDeliveryRecord(delivery.id, {
+    status: "queued",
+    detail: "Retry requested from the notifications workspace",
+  });
+
+  const deliveryResult = await sendEmailDelivery({
+    subject: String(delivery.subject ?? "").trim(),
+    body: String(delivery.body ?? "").trim(),
+  });
+
+  const updatedDelivery = await updateDeliveryRecord(delivery.id, deliveryResult);
+  return updatedDelivery;
+}
+
 const server = createServer(async (request, response) => {
   const requestUrl = new URL(request.url ?? "/", `http://${request.headers.host}`);
 
@@ -841,6 +864,40 @@ const server = createServer(async (request, response) => {
 
   if (requestUrl.pathname === "/api/system/storage" && request.method === "GET") {
     sendJson(response, 200, { storage: storage.getSummary() });
+    return;
+  }
+
+  if (requestUrl.pathname === "/api/settings" && request.method === "GET") {
+    const settings = await repositories.settings.read();
+    sendJson(response, 200, { settings });
+    return;
+  }
+
+  if (requestUrl.pathname === "/api/settings" && request.method === "PATCH") {
+    try {
+      const body = await parseJsonBody(request);
+      const currentSettings = await repositories.settings.read();
+      const nextSettings = {
+        ...currentSettings,
+        businessName: String(body.businessName ?? currentSettings.businessName ?? "").trim(),
+        primaryDomain: String(body.primaryDomain ?? currentSettings.primaryDomain ?? "").trim(),
+        secondaryDomain: String(body.secondaryDomain ?? currentSettings.secondaryDomain ?? "").trim(),
+        founderEmail: String(body.founderEmail ?? currentSettings.founderEmail ?? "").trim(),
+        supportEmail: String(body.supportEmail ?? currentSettings.supportEmail ?? "").trim(),
+        launchMode: String(body.launchMode ?? currentSettings.launchMode ?? "").trim(),
+        defaultInvoiceNote: String(
+          body.defaultInvoiceNote ?? currentSettings.defaultInvoiceNote ?? "",
+        ).trim(),
+        paymentAdapterKey: String(
+          body.paymentAdapterKey ?? currentSettings.paymentAdapterKey ?? config.paymentAdapterKey,
+        ).trim(),
+      };
+
+      await repositories.settings.write(nextSettings);
+      sendJson(response, 200, { settings: nextSettings });
+    } catch {
+      sendJson(response, 400, { error: "settings update failed" });
+    }
     return;
   }
 
@@ -1122,6 +1179,31 @@ const server = createServer(async (request, response) => {
     const deliveries = await readDeliveries();
     sendJson(response, 200, { deliveries });
     return;
+  }
+
+  if (requestUrl.pathname.startsWith("/api/deliveries/") && request.method === "POST") {
+    const pathParts = requestUrl.pathname.split("/").filter(Boolean);
+    const deliveryId = pathParts[2];
+    const action = pathParts[3];
+
+    if (action === "retry") {
+      try {
+        const delivery = await retryDelivery(deliveryId);
+
+        if (!delivery) {
+          sendJson(response, 404, { error: "delivery not found" });
+          return;
+        }
+
+        sendJson(response, 200, {
+          ok: true,
+          delivery,
+        });
+      } catch {
+        sendJson(response, 400, { error: "delivery retry failed" });
+      }
+      return;
+    }
   }
 
   if (requestUrl.pathname === "/api/invoices" && request.method === "GET") {

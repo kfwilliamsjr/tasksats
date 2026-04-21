@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "./auth";
+import { useBusinessSettings } from "./business-settings";
 import {
   flowCards,
   growthPhases,
@@ -11,14 +12,17 @@ import {
 
 export function SiteHeader() {
   const { session, isAuthenticated, signOut } = useAuth();
+  const { settings } = useBusinessSettings();
+  const businessName = settings.businessName || "TaskSats";
+  const primaryDomain = settings.primaryDomain || "tasksats.com";
 
   return (
     <header className="topbar">
       <a href="#hero" className="brand">
         <span className="brand-mark">T</span>
         <span className="brand-copy">
-          <strong>TaskSats</strong>
-          <span>Bitcoin payments for service businesses</span>
+          <strong>{businessName}</strong>
+          <span>{primaryDomain} · Bitcoin payments for service businesses</span>
         </span>
       </a>
 
@@ -35,6 +39,9 @@ export function SiteHeader() {
           <>
             <Link className="ghost-button" to="/merchant">
               Workspace
+            </Link>
+            <Link className="ghost-button" to="/settings">
+              Settings
             </Link>
             <Link className="ghost-button" to="/notifications">
               Notifications
@@ -59,6 +66,8 @@ export function SiteHeader() {
 }
 
 export function HeroSection() {
+  const { settings } = useBusinessSettings();
+
   return (
     <section className="hero" id="hero">
       <div className="hero-copy card">
@@ -68,8 +77,8 @@ export function HeroSection() {
           <span>pay with Bitcoin.</span>
         </h1>
         <p className="hero-text">
-          TaskSats helps service businesses create invoices, accept Bitcoin and
-          Lightning payments, and deliver a checkout flow that feels clear
+          {settings.businessName || "TaskSats"} helps service businesses create invoices,
+          accept Bitcoin and Lightning payments, and deliver a checkout flow that feels clear
           enough for mainstream buyers to trust.
         </p>
         <div className="hero-actions">
@@ -130,9 +139,14 @@ export function HeroSection() {
 }
 
 export function TrustStrip() {
+  const { settings } = useBusinessSettings();
+
   return (
     <section className="trust-strip" aria-label="Trust indicators">
-      <p>Built for service businesses that want to accept Bitcoin.</p>
+      <p>
+        Built for service businesses that want to accept Bitcoin through{" "}
+        {settings.primaryDomain || "tasksats.com"}.
+      </p>
       <p>Fast onboarding</p>
       <p>Instant settlement</p>
       <p>Simple invoice flow</p>

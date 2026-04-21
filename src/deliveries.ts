@@ -25,3 +25,17 @@ export async function fetchDeliveries(): Promise<DeliveryRecord[]> {
   const payload = (await response.json()) as { deliveries?: DeliveryRecord[] };
   return Array.isArray(payload.deliveries) ? payload.deliveries : [];
 }
+
+export async function retryDelivery(
+  id: string,
+): Promise<{ ok: boolean; delivery?: DeliveryRecord }> {
+  const response = await fetch(`${API_BASE_URL}/deliveries/${id}/retry`, {
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    throw new Error("Delivery retry failed");
+  }
+
+  return (await response.json()) as { ok: boolean; delivery?: DeliveryRecord };
+}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { useBusinessSettings } from "../business-settings";
 import { invoicePreview } from "../data";
 import {
   fetchInvoiceCheckout,
@@ -23,6 +24,7 @@ const defaultInvoice = {
 
 export function InvoicePreviewPage() {
   const { invoiceId } = useParams();
+  const { settings } = useBusinessSettings();
   const [invoice, setInvoice] = useState<InvoiceRecord | null>(null);
   const [checkout, setCheckout] = useState<InvoiceCheckout | null>(null);
   const [statusMessage, setStatusMessage] = useState("");
@@ -213,7 +215,7 @@ export function InvoicePreviewPage() {
           <div className="invoice-page-header">
             <div>
               <p className="eyebrow">Hosted invoice preview</p>
-              <h1>TaskSats Invoice #{activeInvoice.id}</h1>
+              <h1>{settings.businessName || "TaskSats"} Invoice #{activeInvoice.id}</h1>
             </div>
             <Link className="ghost-button" to="/">
               Back to homepage
@@ -228,6 +230,9 @@ export function InvoicePreviewPage() {
                   {activeInvoice.amountUsd} / {activeInvoice.amountBtc}
                 </strong>
                 <span>Bitcoin Lightning with USD reference pricing</span>
+                {settings.defaultInvoiceNote ? (
+                  <p className="invoice-checkout-copy">{settings.defaultInvoiceNote}</p>
+                ) : null}
                 {lastSyncedAt ? (
                   <p className="invoice-checkout-copy">Last synced at {lastSyncedAt}</p>
                 ) : null}
@@ -373,6 +378,7 @@ export function InvoicePreviewPage() {
                 <ul className="invoice-meta-list">
                   <li>Client: {activeInvoice.client}</li>
                   <li>Invoice ID: {activeInvoice.id}</li>
+                  {activeInvoice.sourceLeadId ? <li>Source lead: {activeInvoice.sourceLeadId}</li> : null}
                   <li>Payment route: Bitcoin Lightning checkout</li>
                   {checkout ? <li>Lightning address: {checkout.lightningAddress}</li> : null}
                 </ul>

@@ -82,6 +82,13 @@ export function createStorage({ dataDir, defaultPaymentAdapterKey }) {
     deliveries: createJsonCollectionStore(path.join(dataDir, "deliveries.json")),
     settings: createJsonObjectStore(path.join(dataDir, "settings.json"), {
       paymentAdapterKey: defaultPaymentAdapterKey,
+      businessName: "TaskSats",
+      primaryDomain: "tasksats.com",
+      secondaryDomain: "tasksats.ai",
+      founderEmail: "",
+      supportEmail: "",
+      launchMode: "local-prototype",
+      defaultInvoiceNote: "Bitcoin payments for service businesses.",
     }),
   };
 }

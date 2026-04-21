@@ -1,8 +1,10 @@
 import { Link, useParams } from "react-router-dom";
+import { useBusinessSettings } from "../business-settings";
 import { getOfferBySlug } from "../data";
 
 export function OfferPage() {
   const { slug = "" } = useParams();
+  const { settings } = useBusinessSettings();
   const offer = getOfferBySlug(slug);
 
   if (!offer) {
@@ -74,7 +76,7 @@ export function OfferPage() {
             <p className="eyebrow">Outcome</p>
             <h2>Why this matters</h2>
             <p className="merchant-subcopy">
-              TaskSats is being built around practical Bitcoin payment flows for
+              {settings.businessName || "TaskSats"} is being built around practical Bitcoin payment flows for
               service businesses. This offer keeps the scope focused so your
               business can start collecting Bitcoin faster without a large
               integration burden.

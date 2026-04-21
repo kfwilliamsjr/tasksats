@@ -1,0 +1,10 @@
+{
+  "paymentAdapterKey": "demo-lightning",
+  "businessName": "TaskSats",
+  "primaryDomain": "tasksats.com",
+  "secondaryDomain": "tasksats.ai",
+  "founderEmail": "",
+  "supportEmail": "",
+  "launchMode": "local-prototype",
+  "defaultInvoiceNote": "Bitcoin payments for service businesses."
+}

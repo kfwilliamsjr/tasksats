@@ -8,6 +8,7 @@ export type InvoiceRecord = {
   amountUsd: string;
   amountBtc: string;
   status: string;
+  sourceLeadId?: string;
   providerKey?: string;
   providerInvoiceId?: string;
   hostedCheckoutUrl?: string;
@@ -72,6 +73,17 @@ export type RuntimeConfigSummary = {
   btcpayServerConfigured?: boolean;
   btcpayApiKeyConfigured?: boolean;
   btcpayStoreConfigured?: boolean;
+};
+
+export type BusinessSettings = {
+  paymentAdapterKey?: string;
+  businessName?: string;
+  primaryDomain?: string;
+  secondaryDomain?: string;
+  founderEmail?: string;
+  supportEmail?: string;
+  launchMode?: string;
+  defaultInvoiceNote?: string;
 };
 
 export type SystemExportBundle = {
@@ -529,6 +541,40 @@ export async function fetchSystemExportBundle(): Promise<SystemExportBundle | nu
   } catch {
     return null;
   }
+}
+
+export async function fetchBusinessSettings(): Promise<BusinessSettings | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/settings`);
+
+    if (!response.ok) {
+      throw new Error("Settings fetch failed");
+    }
+
+    const payload = (await response.json()) as { settings?: BusinessSettings };
+    return payload.settings ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export async function updateBusinessSettings(
+  input: BusinessSettings,
+): Promise<BusinessSettings> {
+  const response = await fetch(`${API_BASE_URL}/settings`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
+  });
+
+  if (!response.ok) {
+    throw new Error("Settings update failed");
+  }
+
+  const payload = (await response.json()) as { settings?: BusinessSettings };
+  return payload.settings ?? input;
 }
 
 export async function importSystemBundle(

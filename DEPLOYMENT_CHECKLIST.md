@@ -8,6 +8,7 @@ This file turns the current prototype into a concrete launch checklist for `task
   - `tasksats.com` for trust and broad-market positioning
   - `tasksats.ai` if you want the AI angle to lead
 - Point both domains at the final hosting provider if you want one to redirect to the other.
+- Save your chosen business and domain defaults in the in-app launch settings workspace.
 - Set:
   - `TASKSATS_PUBLIC_BASE_URL`
   - `TASKSATS_DOMAIN_COM`
